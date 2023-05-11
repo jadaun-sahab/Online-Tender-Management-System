@@ -36,4 +36,4 @@ Against each tender there may be   bids from several vendors. The company will t
 <img src="https://github.com/jadaun-sahab/dead-test-3122/blob/main/Untitled%20Diagram.drawio.png"/>
 
 <h2>Application Flow Diagram : <h2/>
-<img src="https://drive.google.com/file/d/19dcz0BtSp5XwbK2pJul9uglMV-TIqAuT/view?usp=share_link"/>
+<img src="https://github.com/jadaun-sahab/dead-test-3122/blob/main/AppFlow%20Diagram.drawio.png"/>
