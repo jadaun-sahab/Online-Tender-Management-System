@@ -36,4 +36,4 @@ Against each tender there may be   bids from several vendors. The company will t
 <img src="https://github.com/Sanket01Hiremath/little-spark-7917/blob/master/Untitled%20Diagram.drawio.png?raw=true"/>
 
 <h2>Application Flow Diagram : <h2/>
-<img src="https://drive.google.com/file/d/19dcz0BtSp5XwbK2pJul9uglMV-TIqAuT/view?usp=share_link"/>
+<img src="https://github.com/Sanket01Hiremath/little-spark-7917/blob/master/AppFlow%20Diagram.drawio.png?raw=true"/>
