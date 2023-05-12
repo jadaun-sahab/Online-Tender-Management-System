@@ -9,23 +9,35 @@ import java.util.List;
 
 import com.administrator.AdminMenu;
 import com.connection.DButils;
+import com.exception.CredentialException;
+import com.exception.TenderException;
 import com.models.Bid;
-import com.models.tender;
-import com.models.user;
+import com.models.Tender;
+import com.models.User;
+import com.security.EmailValidation;
+import com.security.HashingPassword;
 import com.start.login;
-
-import Vendor.VendorMenu;
+import com.vendor.VendorMenu;
 
 public class Methods_Impl implements Methods{
+	
+    HashingPassword hashingPassword = new HashingPassword();
+	
+	EmailValidation emailValidation =  new EmailValidation();
+	
 	@Override
-	public void login(String username, String password){
+	public void login(String username, String password) throws TenderException, CredentialException{
+//		With the help of This Method we can login as user or admin
 		Connection conn = null;
 		try {
 			conn = DButils.connectToDatabase();
 		} catch (SQLException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
+		if(emailValidation.emailValidation(username)=="Invalid") {
+			throw new CredentialException("Wrong email address plese provide right syntax of email.");
+		}
+		password = hashingPassword.hashingAlgorithem(password);
 		try {
 			PreparedStatement ps=conn.prepareStatement("select * from user where username = ? and password = ?");
 			ps.setString(1, username);
@@ -42,8 +54,6 @@ public class Methods_Impl implements Methods{
 				}
 			}else {
 				System.out.println("Error: User Not Found!");
-//				login l=new login();
-//				l.Login();
 			}
 		} catch (SQLException e) {
 			System.out.println("Error: User Not Found!");
@@ -54,19 +64,23 @@ public class Methods_Impl implements Methods{
 	}
 
 	@Override
-	public void NewVendor(user User){
+	public void NewVendor(User user) throws CredentialException{
+//		With the help of This Method we can add  new Vender
 		Connection conn = null;
 		try {
 			conn = DButils.connectToDatabase();
 		} catch (SQLException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
+		user.setPassword(hashingPassword.hashingAlgorithem(user.getPassword()));
+		if(emailValidation.emailValidation(user.getUsername())=="Invalid") {
+			throw new CredentialException("Wrong email address plese provide right syntax of email.");
+		}
 		try {
-			PreparedStatement ps=conn.prepareStatement("Insert into users(username,password,user) values(?,?,?)");
-			ps.setString(1, User.getUsername());
-			ps.setString(2, User.getPassword());
-			ps.setInt(3, User.getUserType());
+			PreparedStatement ps=conn.prepareStatement("Insert into user(username,password,usertype) values(?,?,?)");
+			ps.setString(1, user.getUsername());
+			ps.setString(2, user.getPassword());
+			ps.setInt(3, user.getUserType());
 			ps.executeUpdate();
 			System.out.println("New Vendor Added!");
 		} catch (SQLException e) {
@@ -76,20 +90,20 @@ public class Methods_Impl implements Methods{
 	}
 
 	@Override
-	public List<user> getAllVendors(){
-		List<user> list=new ArrayList<>();
+	public List<User> GetAllVendors(){
+//		This Methods is for getting all the Venders from database
+		List<User> list=new ArrayList<>();
 		Connection conn = null;
 		try {
 			conn = DButils.connectToDatabase();
 		} catch (SQLException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 		try {
 			PreparedStatement ps=conn.prepareStatement("select * from users where user=2");
 			ResultSet rs=ps.executeQuery();
 			while(rs.next()) {
-				list.add(new user(rs.getInt("ID"),rs.getString("username"),rs.getString("password"),rs.getInt("user")));
+				list.add(new User(rs.getInt("userID"),rs.getString("username"),rs.getString("password"),rs.getInt("user")));
 			}
 			return list;
 		} catch (SQLException e) {
@@ -100,12 +114,12 @@ public class Methods_Impl implements Methods{
 	}
 
 	@Override
-	public void NewTender(tender t){
+	public void NewTender(Tender t){
+//		This Methods is for adding new tender in to the database
 		Connection conn = null;
 		try {
 			conn = DButils.connectToDatabase();
 		} catch (SQLException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 		try {
@@ -122,20 +136,21 @@ public class Methods_Impl implements Methods{
 	}
 
 	@Override
-	public List<tender> getAllTenders(){
-		List<tender> list=new ArrayList<>();
+	public List<Tender> GetAllTenders(){
+//		This Methods is for getting all the tenders from database
+
+		List<Tender> list=new ArrayList<>();
 		Connection conn = null;
 		try {
 			conn = DButils.connectToDatabase();
 		} catch (SQLException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 		try {
 			PreparedStatement ps=conn.prepareStatement("select * from tenders");
 			ResultSet rs=ps.executeQuery();
 			while(rs.next()) {
-				list.add(new tender(rs.getInt("ID"),rs.getString("name"),rs.getString("type"),rs.getInt("amount"),rs.getInt("bidPrice"),rs.getInt("status"),rs.getInt("vendorID")));
+				list.add(new Tender(rs.getInt("ID"),rs.getString("name"),rs.getString("type"),rs.getInt("amount"),rs.getInt("bidPrice"),rs.getInt("status"),rs.getInt("vendorID")));
 			}
 			return list;
 		} catch (SQLException e) {
@@ -147,7 +162,9 @@ public class Methods_Impl implements Methods{
 	}
 
 	@Override
-	public List<Bid> getAllBids(int id) {
+	public List<Bid> GetAllBids(int id) {
+//		This Methods is for getting all the bids from the database
+
 		List<Bid> list=new ArrayList<>();
 		Connection conn = null;
 		try {
@@ -177,11 +194,10 @@ public class Methods_Impl implements Methods{
 		try {
 			conn = DButils.connectToDatabase();
 		} catch (SQLException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 		try {
-			PreparedStatement ps=conn.prepareStatement("select ID,vendorID,bidPrice from bids where tenderID=? order by bidPrice DESC LIMIT 1");
+			PreparedStatement ps=conn.prepareStatement("select vendorID,bidPrice from bids where tenderID=? order by bidPrice DESC LIMIT 1");
 			ps.setInt(1, id);
 			ResultSet rs=ps.executeQuery();
 			if(rs.next()) {
@@ -196,12 +212,13 @@ public class Methods_Impl implements Methods{
 	}
 
 	@Override
-	public void assignTender(int Tid, int Vid, int bidPrice) {
+	public void AssignTender(int Tid, int Vid, int bidPrice) {
+//		This Methods is assigning tender to the venders
+
 		Connection conn = null;
 		try {
 			conn = DButils.connectToDatabase();
 		} catch (SQLException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 		try(PreparedStatement ps=conn.prepareStatement("update tenders set vendorID=?,bidPrice=?,status=1 where ID=? AND status=0")) {
@@ -224,12 +241,13 @@ public class Methods_Impl implements Methods{
 	
 	
 	@Override
-	public void deleteTender(int Tid) {
+	public void DeleteTender(int Tid) {
+//		This Method is for deleting the Tenders by id
+
 		Connection conn = null;
 		try {
 			conn = DButils.connectToDatabase();
 		} catch (SQLException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 		try {
@@ -247,16 +265,17 @@ public class Methods_Impl implements Methods{
 	}
 
 	@Override
-	public void deleteVendor(int Vid) {
+	public void DeleteVendor(int Vid) {
+//		This Method is for deleting the Venders by id
+
 		Connection conn = null;
 		try {
 			conn = DButils.connectToDatabase();
 		} catch (SQLException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 		try {
-			PreparedStatement ps=conn.prepareStatement("delete from users where ID=? AND user=2");
+			PreparedStatement ps=conn.prepareStatement("delete from users where userID=? AND user=2");
 			ps.setInt(1, Vid);
 			int i=ps.executeUpdate();
 			if(i==1) {
@@ -270,12 +289,13 @@ public class Methods_Impl implements Methods{
 	}
 	
 	@Override
-	public void deleteBid(int tid, int vid) {
+	public void DeleteBid(int tid, int vid) {
+//		This Method is for deleting the Bid
+
 		Connection conn = null;
 		try {
 			conn = DButils.connectToDatabase();
 		} catch (SQLException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 		try {
@@ -289,12 +309,13 @@ public class Methods_Impl implements Methods{
 		
 	}
 	@Override
-	public void deleteBidByTid(int tid) {
+	public void DeleteBidByTid(int tid) {
+//		This Method is for deleting the Bid by Tenerid
+
 		Connection conn = null;
 		try {
 			conn = DButils.connectToDatabase();
 		} catch (SQLException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 		try {
@@ -307,12 +328,13 @@ public class Methods_Impl implements Methods{
 	}
 
 	@Override
-	public void deleteBidByVid(int vid) {
+	public void DeleteBidByVid(int vid) {
+//		This Method is for deleting the Bid by venerid
+
 		Connection conn = null;
 		try {
 			conn = DButils.connectToDatabase();
 		} catch (SQLException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 		try {
@@ -326,12 +348,13 @@ public class Methods_Impl implements Methods{
 	}
 
 	@Override
-	public void placeBid(int tid,int vid,int amount) {
+	public void PlaceBid(int tid,int vid,int amount) {
+//		This Method is for dPLACING the bid for tender
+
 		Connection conn = null;
 		try {
 			conn = DButils.connectToDatabase();
 		} catch (SQLException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 		try {
@@ -347,20 +370,21 @@ public class Methods_Impl implements Methods{
 	}
 
 	@Override
-	public List<com.models.tender> openTenders() {
-		List<tender> list=new ArrayList<>();
+	public List<Tender> OpenTenders() {
+//		This Method is for getting tender
+
+		List<Tender> list=new ArrayList<>();
 		Connection conn = null;
 		try {
 			conn = DButils.connectToDatabase();
 		} catch (SQLException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 		try {
 			PreparedStatement ps=conn.prepareStatement("select * from tenders where status=0");
 			ResultSet rs=ps.executeQuery();
 			while(rs.next()) {
-				list.add(new tender(rs.getInt("ID"),rs.getString("name"),rs.getString("type"),rs.getInt("amount"),rs.getInt("bidPrice"),rs.getInt("status"),rs.getInt("vendorID")));
+				list.add(new Tender(rs.getInt("ID"),rs.getString("name"),rs.getString("type"),rs.getInt("amount"),rs.getInt("bidPrice"),rs.getInt("status"),rs.getInt("vendorID")));
 			}
 			return list;
 		} catch (SQLException e) {
@@ -373,12 +397,13 @@ public class Methods_Impl implements Methods{
 
 	@Override
 	public List<Bid> AllBidsOfVendor(int tid,int vid) {
+//		This Method is for getting all the Bids of vender
+
 		List<Bid> list=new ArrayList<>();
 		Connection conn = null;
 		try {
 			conn = DButils.connectToDatabase();
 		} catch (SQLException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 		try {
@@ -397,13 +422,14 @@ public class Methods_Impl implements Methods{
 	}
 
 	@Override
-	public List<tender> AllTendersOfVendor(int id) {
-		List<tender> list=new ArrayList<>();
+	public List<Tender> AllTendersOfVendor(int id) {
+//		This Method is for getting all the tenders
+
+		List<Tender> list=new ArrayList<>();
 		Connection conn = null;
 		try {
 			conn = DButils.connectToDatabase();
 		} catch (SQLException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 		try {
@@ -411,7 +437,7 @@ public class Methods_Impl implements Methods{
 			ps.setInt(1, id);
 			ResultSet rs=ps.executeQuery();
 			while(rs.next()) {
-				list.add(new tender(rs.getInt("ID"),rs.getString("name"),rs.getString("type"),rs.getInt("amount"),rs.getInt("bidPrice"),rs.getInt("status"),rs.getInt("vendorID")));
+				list.add(new Tender(rs.getInt("ID"),rs.getString("name"),rs.getString("type"),rs.getInt("amount"),rs.getInt("bidPrice"),rs.getInt("status"),rs.getInt("vendorID")));
 			}
 			return list;
 		} catch (SQLException e) {

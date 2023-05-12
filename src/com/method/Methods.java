@@ -2,26 +2,28 @@ package com.method;
 
 import java.util.List;
 
+import com.exception.CredentialException;
+import com.exception.TenderException;
 import com.models.Bid;
-import com.models.tender;
-import com.models.user;
+import com.models.Tender;
+import com.models.User;
 
 public interface Methods {
-	public void login(String username,String password);
-	public void NewVendor(user User);
-	public List<user> getAllVendors();
-	public void NewTender(tender t);
-	public List<tender> getAllTenders();
-	public List<Bid> getAllBids(int id);
+	public void login(String username,String password) throws TenderException,CredentialException;
+	public void NewVendor(User User)throws CredentialException;
+	public List<User> GetAllVendors();
+	public void NewTender(Tender t);
+	public List<Tender> GetAllTenders();
+	public List<Bid> GetAllBids(int id);
 	public int[] MaxBid(int id);
-	public void assignTender(int Tid,int Vid,int bidPrice);
-	public void deleteBidByTid(int tid);
-	public void deleteBidByVid(int vid);
-	public void deleteBid(int tid,int vid);
-	public void deleteTender(int Tid);
-	public void deleteVendor(int Vid);
-	public List<tender> openTenders();
-	public void placeBid(int tid,int vid,int amount);
+	public void AssignTender(int Tid,int Vid,int bidPrice);
+	public void DeleteBidByTid(int tid);
+	public void DeleteBidByVid(int vid);
+	public void DeleteBid(int tid,int vid);
+	public void DeleteTender(int Tid);
+	public void DeleteVendor(int Vid);
+	public List<Tender> OpenTenders();
+	public void PlaceBid(int tid,int vid,int amount);
 	public List<Bid> AllBidsOfVendor(int tid,int vid);
-	public List<tender> AllTendersOfVendor(int id);
+	public List<Tender> AllTendersOfVendor(int id);
 }

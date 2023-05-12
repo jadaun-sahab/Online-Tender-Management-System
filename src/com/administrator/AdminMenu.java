@@ -2,11 +2,13 @@ package com.administrator;
 
 import java.util.Scanner;
 
+import com.exception.CredentialException;
+import com.exception.TenderException;
 import com.start.login;
 
 
 public class AdminMenu {
-	public void Amenu(int id){
+	public void Amenu(int id) throws TenderException, CredentialException{
 		Scanner sc=new Scanner(System.in);
 		System.out.println(":------------------------------: Admin Menu");
 		System.out.println("1) Register New Vendor");
@@ -20,39 +22,40 @@ public class AdminMenu {
 		System.out.println("9) LogOut");
 		
 		System.out.print("Enter Your Choice: ");
-		int c=sc.nextInt();
+		int options=sc.nextInt();
 		
-		switch(c) {
-		case 1:newVendor v=new newVendor();
-			v.addNewVendor(id);
+		switch(options) {
+		case 1:NewVendor new_vendor=new NewVendor();
+			new_vendor.addNewVendor(id);
 			break;
-		case 2:AllVendors a=new AllVendors();
-			a.getVendors(id);
+		case 2:AllVendors all_vendor=new AllVendors();
+			all_vendor.getVendors(id);
 			break;
-		case 3:newTender n=new newTender();
-			n.addnewTender(id);
+		case 3:NewTender new_tender=new NewTender();
+			new_tender.addnewTender(id);
 			break;
-		case 4:AllTenders t=new AllTenders();
-			t.getTenders(id);
+		case 4:AllTenders all_tender=new AllTenders();
+			all_tender.getTenders(id);
 			break;
-		case 5:AllBids b=new AllBids();
-			b.getBids(id);
+		case 5:AllBids all_bid=new AllBids();
+			all_bid.getBids(id);
 			break;
-		case 6:AutoAssignTender at=new AutoAssignTender();
-			at.getMaxBid(id);
+		case 6:AutoAssignTender assigning_tender=new AutoAssignTender();
+			assigning_tender.getMaxBid(id);
 			break;
-		case 7:deleteTender dt=new deleteTender();
-			dt.deletetender(id);
+		case 7:DeleteTender deleting_tendor=new DeleteTender();
+			deleting_tendor.deletetender(id);
 			break;
-		case 8:deleteVendor dv=new deleteVendor();
-			dv.DeleteVendor(id);
+		case 8:DeleteVendor deleting_vendor=new DeleteVendor();
+			deleting_vendor.DeleteVendor(id);
 			break;
-		case 9:login l=new login();
-			l.Login();
+		case 9:login log_in=new login();
+			log_in.Login();
 			break;
 		default:System.out.println("Enter Correct Choice!");
-			AdminMenu m=new AdminMenu();
-			m.Amenu(id);
+			AdminMenu admin_menu=new AdminMenu();
+			admin_menu.Amenu(id);
+			sc.close();
 		}
 	}
 }

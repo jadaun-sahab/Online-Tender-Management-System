@@ -2,6 +2,8 @@ package com.start;
 
 import java.util.Scanner;
 
+import com.exception.CredentialException;
+import com.exception.TenderException;
 import com.method.Methods;
 import com.method.Methods_Impl;
 
@@ -9,9 +11,9 @@ import com.method.Methods_Impl;
 
 public class login {
 
-	public void Login(){
+	public void Login() throws TenderException, CredentialException{
 		Scanner sc=new Scanner(System.in);
-		Methods m=new Methods_Impl();
+		Methods methods_implemen=new Methods_Impl();
 		System.out.println(":--------------------------------------------------------------------------------:");
 		System.out.println(":                        Online Tender Management System                         :");
 		System.out.println(":--------------------------------------------------------------------------------:");
@@ -20,6 +22,7 @@ public class login {
 		String username=sc.next();
 		System.out.print("Password: ");
 		String password=sc.next();
-		m.login(username, password);
+		methods_implemen.login(username, password);
+		sc.close();
 	}
 }
