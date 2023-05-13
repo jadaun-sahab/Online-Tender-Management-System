@@ -18,7 +18,7 @@ public class login {
 		System.out.println(":                        Online Tender Management System                         :");
 		System.out.println(":--------------------------------------------------------------------------------:");
 		System.out.println(":----------------------------------: Login");
-		System.out.print("Username: ");
+		System.out.print("Email-Address: ");
 		String username=sc.next();
 		System.out.print("Password: ");
 		String password=sc.next();
